@@ -1,118 +1,186 @@
+import Head from "next/head";
+import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
-import { Inter } from "next/font/google";
+import path from "path";
 
-const inter = Inter({ subsets: ["latin"] });
+import { FaHeart } from "react-icons/fa";
+import { FaRegComment } from "react-icons/fa";
+import { IoIosStats } from "react-icons/io";
+import { FaAmazon } from "react-icons/fa";
+import { IoMdStar } from "react-icons/io";
+import { IoSearch } from "react-icons/io5";
 
-export default function Home() {
+import sqlite3 from "sqlite3";
+
+export default function Home({ data }) {
+  // console.log(data);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState(data);
+
+  const handleSearch = (query) => {
+    const filteredResults = data.filter(
+      (book) =>
+        book.book_title.toLowerCase().includes(query.toLowerCase()) ||
+        book.author_name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // Prioritize results by book title
+    const prioritizedResults = filteredResults.sort((a, b) => {
+      const aTitleMatch = a.book_title
+        .toLowerCase()
+        .includes(query.toLowerCase());
+      const bTitleMatch = b.book_title
+        .toLowerCase()
+        .includes(query.toLowerCase());
+      return bTitleMatch - aTitleMatch;
+    });
+
+    setResults(prioritizedResults);
+  };
+
+  const handleInputChange = (e) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    handleSearch(newQuery);
+  };
+
+  const formatImpressions = (impressions) => {
+    return impressions >= 1000
+      ? (impressions / 1000).toFixed(1) + "K"
+      : impressions;
+  };
+
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24 ${inter.className}`}
-    >
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/pages/index.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="flex flex-col items-center min-h-screen px-8 pb-8 pt-4 md:pt-8">
+      <Head>
+        <meta name="robots" content="noindex" />
+      </Head>
+      <h1 className="text-zinc-200 text-3xl md:text-5xl font-bold font-mono">
+        shouldreads
+      </h1>
+      <div className="w-full max-w-3xl my-8 md:mt-16">
+        <div className="rounded-t-2xl overflow-hidden border border-b-0 border-zinc-800">
+          <Image
+            src="/tweet.jpeg"
+            alt="Logo"
+            width={500}
+            height={500}
+            className="object-cover pt-1"
+          />
+        </div>
+        <div className="bg-black px-4 pb-2 rounded-b-2xl border border-t-0 border-zinc-800">
+          <p className="text-gray-500 text-justify text-sm md:text-base">
+            someone posted this on twitter and people gave a lot of good book
+            recommendations. But it was hard to keep track of all the books
+            mentioned. So I made this website to help you find the books
+            mentioned in the thread using some data science + ai magic
+          </p>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700/10 after:dark:from-sky-900 after:dark:via-[#0141ff]/40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="flex flex-col justify-center items-center md:my-8 w-full transition-transform duration-500 ">
+        {/* <label className="block text-gray-500 mb-2 text-center">
+          what kind of book are you looking for?
+        </label> */}
+        <div className="flex w-full md:w-auto">
+          <input
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            className="px-4 py-2 md:w-72 w-full bg-zinc-900 border-y border-l border-zinc-800 rounded-l-xl outline-none"
+            placeholder="search for a book or an author"
+          />
+          <button
+            onClick={() => handleSearch(query)}
+            className="px-4 py-2 md:w-24 bg-blue-500 text-white rounded-r-xl hover:bg-blue-600 flex justify-center items-center"
+          >
+            <span className="hidden md:block">Search</span>
+            <IoSearch className="block md:hidden h-5 w-5" />
+          </button>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Discover and deploy boilerplate example Next.js&nbsp;projects.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+      {results && (
+        <div className="mt-8 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {results.map((result, index) => (
+            <div
+              key={index}
+              className="relative p-4 bg-zinc-900 rounded-2xl shadow-md border border-zinc-800 hover:border-blue-500 transition-colors duration-300 group flex flex-col justify-between"
+            >
+              <div className="flex flex-col justify-between h-full">
+                <div className="">
+                  <h3 className="text-lg text-zinc-200 font-medium group-hover:text-blue-300 transition-colors duration-300 capitalize">
+                    {result.book_title}
+                  </h3>
+                  <p className="text-sm text-gray-500 line-clamp-1 group-hover:line-clamp-none">
+                    {result.author_name}
+                  </p>
+                </div>
+                <div className="my-4">
+                  <p className="text-sm text-gray-500">
+                    Mentioned {result.mentions} times
+                  </p>
+                </div>
+                <div className="flex text-sm text-gray-500 justify-between">
+                  <div className="flex items-center">
+                    <FaRegComment className="inline-block mr-1" />
+                    <span>{result.comments}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <FaHeart className="inline-block mr-1" />
+                    <span>{result.likes}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <IoIosStats className="inline-block mr-1" />
+                    <span>{formatImpressions(result.impressions)}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <IoMdStar className="inline-block mr-1" />
+                    <span>{result.ratings || "N/A"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
+}
+
+export async function getStaticProps() {
+  async function openDB() {
+    return new Promise((resolve, reject) => {
+      const dbPath = path.join(process.cwd(), "public", "output.db");
+      const db = new sqlite3.Database(dbPath, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(db);
+        }
+      });
+    });
+  }
+
+  const db = await openDB();
+
+  const data = await new Promise((resolve, reject) => {
+    db.all(
+      "SELECT book_title, author_name, mentions, comments, likes, impressions, amazon_id, olid, ratings, pages FROM aggregated_books",
+      (err, row) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(row);
+      }
+    );
+  });
+
+  db.close();
+
+  return {
+    props: {
+      data,
+    },
+  };
 }
