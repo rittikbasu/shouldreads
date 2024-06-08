@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",
+    "clsx": "^2.1.1",
     "next": "14.2.3",
     "openai": "^4.49.1",
     "react": "^18",
