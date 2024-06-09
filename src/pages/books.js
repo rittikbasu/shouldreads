@@ -3,13 +3,9 @@ import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 
-import { FaHeart } from "react-icons/fa";
-import { FaRegComment } from "react-icons/fa";
-import { IoIosStats } from "react-icons/io";
-import { FaAmazon } from "react-icons/fa";
-import { IoMdStar } from "react-icons/io";
+import { FaHeart, FaRegComment, FaAmazon, FaChevronDown } from "react-icons/fa";
+import { IoIosStats, IoMdStar } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
-import { FaChevronDown } from "react-icons/fa";
 import { FaArrowLeftLong } from "react-icons/fa6";
 
 import { init } from "../../utils/db";
@@ -206,19 +202,25 @@ export default function Home({ data }) {
           </div>
         </div>
       </div>
+      <div className="flex place-items-center absolute -top-44 left-1/2 transform -translate-x-1/2 -z-10 before:h-[300px] before:w-[300px] before:translate-x-0 before:rounded-full before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[240px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:blur-2xl after:content-[''] before:bg-gradient-to-br before:from-transparent before:to-blue-700/10 after:from-sky-900 after:via-[#0141ff]/40 before:lg:h-[360px]"></div>
       {results && (
         <div className="mt-8 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {results.map((result, index) => (
             <div
               key={result.id}
-              className="relative p-4 bg-zinc-900 rounded-2xl shadow-md border border-zinc-800 hover:border-blue-500 transition-colors duration-300 group flex flex-col justify-between"
+              className="relative p-4 bg-zinc-900 rounded-2xl shadow-md border border-zinc-800 hover:border-blue-500 group flex flex-col justify-between hover:scale-110 transition duration-500"
             >
-              <div className="absolute -top-[0.07rem] -right-[0.06rem] bg-zinc-800 border border-zinc-700 text-zinc-200 w-10 rounded-tr-2xl rounded-bl text-sm text-center">
-                {index + 1}
+              <div
+                className="absolute -top-4 -right-4 text-transparent text-4xl font-bold z-10 group-hover:opacity-0 opacity-100 transition-opacity duration-300"
+                style={{
+                  WebkitTextStroke: "1px #71717a",
+                }}
+              >
+                {(index + 1).toString().padStart(2, "0")}
               </div>
               <div className="flex flex-col justify-between h-full">
                 <div className="">
-                  <h3 className="text-lg text-zinc-200 font-medium group-hover:text-blue-300 transition-colors duration-300 capitalize">
+                  <h3 className="text-lg text-zinc-200 font-medium group-hover:text-blue-300 transition-colors duration-500 capitalize">
                     {result.book_title}
                   </h3>
                   <p className="text-sm text-gray-500 line-clamp-1 group-hover:line-clamp-none">
@@ -235,7 +237,7 @@ export default function Home({ data }) {
                   <Link
                     href={`https://www.amazon.com/dp/${result.amazon_id}`}
                     target="_blank"
-                    className="bg-blue-950/60 px-2 py-0.5 rounded-md text-gray-500 hover:bg-blue-900 hover:text-gray-300 flex items-center "
+                    className="bg-gray-600/50 px-2 py-0.5 rounded-md text-gray-400 hover:bg-blue-700 hover:text-gray-300 flex items-center "
                   >
                     <span className="text-sm">
                       <FaAmazon className="inline-block" /> Order
