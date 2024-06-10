@@ -1,3 +1,4 @@
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Work_Sans } from "next/font/google";
@@ -24,6 +25,17 @@ export default function App({ Component, pageProps }) {
         "flex flex-col min-h-screen relative max-w-3xl mx-auto"
       )}
     >
+      <Head>
+        <meta
+          name="description"
+          content="find the most important books from a twitter thread"
+        />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
+        />
+        <title>shouldreads</title>
+      </Head>
       <header className="flex justify-center items-center w-full max-w-3xl mx-auto py-4 sm:py-8 relative">
         {router.pathname !== "/" && (
           <Link

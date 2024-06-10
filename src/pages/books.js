@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
@@ -133,10 +132,6 @@ export default function Home({ data }) {
 
   return (
     <>
-      <Head>
-        <meta name="description" content="find must read books" />
-        <title>shouldreads</title>
-      </Head>
       <div className="sticky top-0 w-full max-w-md z-20 mt-8 md:mt-16">
         <label className="block text-center text-gray-500 mb-2">
           {aiToggle
