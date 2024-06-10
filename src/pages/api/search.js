@@ -1,5 +1,5 @@
-import { getEmbedding } from "../../../utils/embedding";
-import { init } from "../../../utils/db";
+import { getEmbedding } from "../../utils/embedding";
+import { init } from "../../utils/db";
 
 const db = init();
 
