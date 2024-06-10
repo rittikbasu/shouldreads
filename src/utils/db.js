@@ -4,6 +4,7 @@ import path from "path";
 
 export const init = (loadVSS = true) => {
   const dbPath = path.join(process.cwd(), "public", "output.db");
+  console.log("dbPath", dbPath);
   const db = new Database(dbPath);
   db.pragma("journal_mode = WAL");
 
