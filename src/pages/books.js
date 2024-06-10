@@ -160,7 +160,7 @@ export default function Home({ data }) {
               onChange={handleFilterChange}
               className={clsx(
                 " outline-none appearance-none w-full bg-transparent border-zinc-600",
-                aiToggle ? "border-r " : "rounded-lg sm:border-r"
+                aiToggle ? "border-r " : "sm:border-r"
               )}
             >
               <option value="">filters</option>
