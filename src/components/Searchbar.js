@@ -184,7 +184,7 @@ export function Searchbar({
         }}
         ref={inputRef}
         value={value}
-        type="text"
+        type="search"
         className={cn(
           "w-full relative text-sm sm:text-base z-50 border-none text-white bg-transparent h-full rounded-2xl focus:outline-none focus:ring-0 pl-12 sm:pl-14 pr-12 sm:pr-14",
           animating && "text-transparent dark:text-transparent"
