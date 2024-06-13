@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/utils/cn";
 
+import { MdClear } from "react-icons/md";
+
 export function Searchbar({
   placeholders,
   onChange,
@@ -120,7 +122,7 @@ export function Searchbar({
           });
         }
         if (newDataRef.current.length > 0) {
-          animateFrame(pos - 8);
+          animateFrame(pos - 4);
         } else {
           setValue("");
           setAnimating(false);
@@ -130,15 +132,10 @@ export function Searchbar({
     animateFrame(start);
   };
 
-  //   const handleKeyDown = (e) => {
-  //     if (e.key === "Enter" && !animating) {
-  //       vanishAndSubmit();
-  //     }
-  //   };
-
-  const vanishAndSubmit = () => {
+  const vanishInput = () => {
     setAnimating(true);
     draw();
+    onChange && onChange({ target: { value: "" } });
 
     const value = inputRef.current?.value || "";
     if (value && inputRef.current) {
@@ -152,7 +149,6 @@ export function Searchbar({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // vanishAndSubmit();
     onSubmit && onSubmit(value);
   };
   return (
@@ -165,7 +161,7 @@ export function Searchbar({
     >
       <canvas
         className={cn(
-          "absolute pointer-events-none text-base transform scale-50 top-[20%] left-2 sm:left-8 origin-top-left filter invert-0 pr-20",
+          "absolute pointer-events-none text-base transform scale-50 top-[20%] left-10 sm:left-12 origin-top-left filter invert-0 pr-20",
           !animating ? "opacity-0" : "opacity-100"
         )}
         ref={canvasRef}
@@ -185,10 +181,13 @@ export function Searchbar({
         ref={inputRef}
         value={value}
         type="search"
+        name="search"
         className={cn(
           "w-full relative text-sm sm:text-base z-50 border-none text-white bg-transparent h-full rounded-2xl focus:outline-none focus:ring-0 pl-12 sm:pl-14 pr-12 sm:pr-14",
-          animating && "text-transparent dark:text-transparent"
+          animating && "text-transparent dark:text-transparent",
+          "clear-button"
         )}
+        disabled={animating}
       />
 
       <button
@@ -196,7 +195,8 @@ export function Searchbar({
         type="submit"
         className={cn(
           "absolute right-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 transition duration-300 flex items-center justify-center rounded-full",
-          value ? "bg-zinc-700" : "bg-transparent"
+          value ? "bg-zinc-700" : "bg-transparent",
+          aiToggle ? "opacity-100" : "opacity-0"
         )}
       >
         <motion.svg
@@ -242,9 +242,19 @@ export function Searchbar({
         AI
       </button>
 
+      {!aiToggle && value && (
+        <button
+          type="button"
+          className="absolute right-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 text-zinc-500 flex items-center cursor-pointer"
+          onClick={vanishInput}
+        >
+          <MdClear className="h-4 w-4" />
+        </button>
+      )}
+
       <div className="absolute inset-0 flex items-center rounded-2xl pointer-events-none">
-        <AnimatePresence mode="wait">
-          {!value && (
+        {!value && (
+          <AnimatePresence mode="wait">
             <motion.p
               initial={{
                 y: 5,
@@ -267,8 +277,8 @@ export function Searchbar({
             >
               {placeholders[currentPlaceholder]}
             </motion.p>
-          )}
-        </AnimatePresence>
+          </AnimatePresence>
+        )}
       </div>
     </form>
   );

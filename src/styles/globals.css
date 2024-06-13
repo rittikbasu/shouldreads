@@ -36,3 +36,17 @@ body {
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
+
+.clear-button::-webkit-search-cancel-button {
+  display: none;
+}
+.clear-button::-ms-clear {
+  display: none;
+  width: 0;
+  height: 0;
+}
+.clear-button::-ms-reveal {
+  display: none;
+  width: 0;
+  height: 0;
+}
