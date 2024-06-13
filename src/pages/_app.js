@@ -28,13 +28,24 @@ export default function App({ Component, pageProps }) {
       <Head>
         <meta
           name="description"
-          content="find the most important books from a twitter thread"
+          content="the most important books to read compiled from a twitter thread"
         />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1"
         />
+        <meta name="theme-color" content="#000000" />
+        <link rel="icon" href="/favicon.png" />
+
         <title>shouldreads</title>
+
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="shouldreads" />
+        <meta
+          name="twitter:description"
+          content="the most important books to read compiled from a twitter thread"
+        />
+        <meta name="twitter:image" content="/favicon.png" />
       </Head>
       <header className="flex justify-center items-center w-full max-w-3xl mx-auto py-4 sm:py-8 relative">
         {router.pathname !== "/" && (
