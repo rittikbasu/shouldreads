@@ -12,25 +12,25 @@ export default function Home() {
         <title>shouldreads</title>
       </Head>
       <div className="w-full my-8 md:mt-16">
-        <div className="rounded-2xl overflow-hidden border border-zinc-900 bg-black">
+        <div className="rounded-xl sm:rounded-3xl overflow-hidden border border-zinc-900 bg-black">
           <Image
             src="/tweet.jpeg"
             alt="Logo"
             width={500}
             height={500}
-            className="object-cover w-full pt-1"
+            className="object-cover w-full p-2 pb-1.5 sm:p-4 sm:pb-3"
           />
         </div>
       </div>
       <div className="bg-black pb-2">
-        <p className="text-gray-400 text-justify text-base leading-relaxed sm:text-xl">
-          Someone posted this on Twitter, and there were so many amazing book
-          recommendations. It was overwhelming to keep track of all the titles,
-          and I really wanted to know which ones were the best. So, I created
-          this website to not only help myself but also to share this treasure
-          trove of book recommendations with others. Using some data science +
-          ai magic I was able to find the most recommended books from the thread
-          and put them all in one place. Enjoy!
+        <p className="text-gray-400 text-justify text-balance text-base leading-relaxed sm:text-xl">
+          I came across this post on twitter and under it I found so many
+          amazing book recommendations. It was overwhelming to keep track of all
+          the titles, and I really wanted to know which books and authors were
+          mentioned the most, what were the top rated books, and which books
+          were liked the most. So, I created this website using some data
+          science + ai magic to not only help myself but also to share this
+          treasure trove of book recommendations with others. Enjoy!
         </p>
       </div>
       <Link
