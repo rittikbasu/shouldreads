@@ -35,7 +35,7 @@ export function Searchbar({
     if (!inputRef.current) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
     canvas.width = 800;
@@ -154,7 +154,7 @@ export function Searchbar({
   return (
     <form
       className={cn(
-        "w-full relative mx-auto bg-zinc-800/50 webkit-backdrop-blur border border-zinc-800 h-12 rounded-2xl overflow-hidden transition duration-200",
+        "w-full relative mx-auto bg-zinc-900/50 webkit-backdrop-blur border border-zinc-800/50 h-12 rounded-2xl overflow-hidden transition duration-200",
         value && ""
       )}
       onSubmit={handleSubmit}
@@ -182,6 +182,7 @@ export function Searchbar({
         value={value}
         type="search"
         name="search"
+        autoComplete="off"
         className={cn(
           "w-full relative text-sm sm:text-base z-50 border-none text-white bg-transparent h-full rounded-2xl focus:outline-none focus:ring-0 pl-12 sm:pl-14 pr-12 sm:pr-14",
           animating && "text-transparent dark:text-transparent",
@@ -234,8 +235,8 @@ export function Searchbar({
       <button
         type="button"
         className={cn(
-          "absolute left-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 text-white rounded-full flex items-center justify-center transition-colors duration-300",
-          aiToggle ? "bg-blue-600" : "bg-zinc-700"
+          "absolute left-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 text-zinc-200 rounded-full flex items-center justify-center transition-colors duration-300",
+          aiToggle ? "bg-blue-600" : "bg-zinc-800"
         )}
         onClick={() => setAiToggle((prev) => !prev)}
       >
