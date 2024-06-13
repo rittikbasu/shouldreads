@@ -1,18 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 
 import { FaHeart, FaRegComment, FaAmazon, FaChevronDown } from "react-icons/fa";
 import { IoIosStats, IoMdStar } from "react-icons/io";
 import { MdClear } from "react-icons/md";
+import { CiDesktopMouse2 } from "react-icons/ci";
 
-import { init } from "@/utils/db";
+import { turso } from "@/utils/db";
 import { Searchbar } from "@/components/Searchbar";
+import Modal from "@/components/Modal";
 
 export default function Home({ data }) {
+  // console.log(data);
   const [results, setResults] = useState(data);
   const [aiToggle, setAiToggle] = useState(false);
   const [filter, setFilter] = useState("");
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showTopButton, setShowTopButton] = useState(false);
   const searchPlaceholders = [
     "The Beginning of Infinity",
     "George Orwell",
@@ -29,18 +34,14 @@ export default function Home({ data }) {
   const handleSearch = (query) => {
     const filteredResults = data.filter(
       (book) =>
-        book.book_title.toLowerCase().includes(query.toLowerCase()) ||
-        book.author_name.toLowerCase().includes(query.toLowerCase())
+        book.title.toLowerCase().includes(query.toLowerCase()) ||
+        book.author.toLowerCase().includes(query.toLowerCase())
     );
 
     // Prioritize results by book title
     const prioritizedResults = filteredResults.sort((a, b) => {
-      const aTitleMatch = a.book_title
-        .toLowerCase()
-        .includes(query.toLowerCase());
-      const bTitleMatch = b.book_title
-        .toLowerCase()
-        .includes(query.toLowerCase());
+      const aTitleMatch = a.title.toLowerCase().includes(query.toLowerCase());
+      const bTitleMatch = b.title.toLowerCase().includes(query.toLowerCase());
       return bTitleMatch - aTitleMatch;
     });
 
@@ -124,6 +125,23 @@ export default function Home({ data }) {
     setResults(data);
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 200) {
+        setShowTopButton(true);
+      } else {
+        setShowTopButton(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const formatImpressions = (impressions) => {
     return impressions >= 1000
       ? (impressions / 1000).toFixed(1) + "K"
@@ -147,21 +165,23 @@ export default function Home({ data }) {
           setAiToggle={setAiToggle}
         />
       </div>
-      <div className="flex justify-between items-center mt-4 w-full max-w-md transition-transform duration-500">
-        <div
-          className={clsx(
-            "flex items-center sm:min-w-64 px-1.5 py-1 bg-zinc-600/50 text-sm text-gray-400 border rounded-lg border-zinc-700",
-            aiToggle && "min-w-[13rem]"
-          )}
-        >
-          <div className="relative flex-1">
+
+      <button
+        onClick={scrollToTop}
+        className={clsx(
+          "fixed bottom-4 sm:bottom-8 right-4 md:left-[90%] lg:left-[80%] h-12 w-12 flex items-center justify-center bg-blue-500/30 webkit-backdrop-blur text-white p-2 rounded-full shadow-lg sm:hover:bg-blue-600/50 transition duration-500 z-20 outline-none",
+          showTopButton ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+      >
+        <CiDesktopMouse2 className="h-8 w-8 text-zinc-300" />
+      </button>
+      <div className="flex justify-between items-center mt-4 w-full max-w-md transition-transform duration-500 sm:px-1">
+        <div className="flex items-center min-w-44 pl-3 pr-1 py-1 bg-zinc-700/50 text-sm text-gray-400 border rounded-lg border-zinc-700/40">
+          <div className="relative w-full">
             <select
               value={filter}
               onChange={handleFilterChange}
-              className={clsx(
-                " outline-none appearance-none w-full bg-transparent border-zinc-600",
-                aiToggle ? "border-r " : "sm:border-r"
-              )}
+              className="outline-none appearance-none w-full bg-transparent"
             >
               <option value="">filters</option>
               <option value="topAuthors">top authors</option>
@@ -173,20 +193,6 @@ export default function Home({ data }) {
             </select>
             <FaChevronDown className="absolute right-2 h-2.5 w-2.5 top-1/2 transform -translate-y-1/2 text-gray-300 pointer-events-none" />
           </div>
-          <div
-            className={clsx(
-              "relative",
-              aiToggle ? "flex-1" : "hidden sm:block sm:flex-1"
-            )}
-          >
-            <select className="bg-transparent outline-none appearance-none w-full ml-1">
-              <option value="">results</option>
-              <option value="mentions">10</option>
-              <option value="likes">20</option>
-              <option value="comments">50</option>
-            </select>
-            <FaChevronDown className="absolute right-0.5 h-2.5 w-2.5 top-1/2 transform -translate-y-1/2 text-gray-300 pointer-events-none" />
-          </div>
         </div>
         <button
           onClick={clearFilter}
@@ -197,12 +203,14 @@ export default function Home({ data }) {
       </div>
 
       {results && (
-        <div className="mt-8 sm:mt-12 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="mt-10 sm:mt-12 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {results.map((book, index) => (
             <div
               key={book.id}
-              className="relative p-4 bg-zinc-900 rounded-2xl shadow-md border border-zinc-800 hover:border-blue-500 group flex flex-col justify-between md:hover:scale-110 transition duration-500"
+              onClick={() => setSelectedBook(book)}
+              className="relative p-4 bg-zinc-900/50 rounded-2xl shadow-md border border-zinc-900 hover:border-blue-500 group flex flex-col justify-between md:hover:scale-110 transition duration-500"
             >
+              <div className="absolute z-0 blur-3xl h-16 w-16 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-500"></div>
               <div
                 className="absolute -top-4 -right-4 text-transparent text-4xl font-bold z-10 group-hover:opacity-0 opacity-100 transition-opacity duration-300"
                 style={{
@@ -214,10 +222,13 @@ export default function Home({ data }) {
               <div className="flex flex-col justify-between h-full">
                 <div className="">
                   <h3 className="text-lg text-zinc-200 font-medium group-hover:text-blue-300 transition-colors duration-500 capitalize">
-                    {book.book_title}
+                    {book.title}
                   </h3>
                   <p className="text-sm text-gray-500 line-clamp-1 group-hover:line-clamp-none">
-                    {book.author_name}
+                    {book.author}
+                  </p>
+                  <p className="text-sm text-blue-200 mt-2 line-clamp-1 group-hover:line-clamp-none group-hover:text-zinc-200 transition-colors duration-500">
+                    {book.categories}
                   </p>
                 </div>
                 <div className="my-4 flex items-center justify-between">
@@ -228,13 +239,9 @@ export default function Home({ data }) {
                     Mentioned {book.mentions} times
                   </p>
                   <Link
-                    href={
-                      book.amazon_id
-                        ? `https://www.amazon.com/dp/${book.amazon_id}`
-                        : `https://www.amazon.com/s?k=${encodeURIComponent(
-                            book.book_title
-                          )}`
-                    }
+                    href={`https://www.amazon.com/s?k=${encodeURIComponent(
+                      book.title
+                    )}`}
                     target="_blank"
                     className="bg-gray-600/50 px-2 py-0.5 rounded-md text-gray-400 hover:bg-blue-700 hover:text-gray-300 flex items-center "
                   >
@@ -264,6 +271,12 @@ export default function Home({ data }) {
               </div>
             </div>
           ))}
+          {selectedBook && (
+            <Modal
+              book={selectedBook}
+              onClose={() => setSelectedBook(null)} // Close the modal
+            />
+          )}
         </div>
       )}
     </>
@@ -271,18 +284,28 @@ export default function Home({ data }) {
 }
 
 export async function getStaticProps() {
-  const db = init(false);
-
-  const data = db
-    .prepare(
-      `SELECT id, book_title, author_name, mentions, comments, likes, impressions, amazon_id, olid, ratings, pages,
-      (SELECT COUNT(*) FROM aggregated_books AS ab WHERE ab.author_name = aggregated_books.author_name) AS author_books,
-      (SELECT SUM(mentions) FROM aggregated_books AS ab WHERE ab.author_name = aggregated_books.author_name) AS author_mentions
+  const result = await turso.execute(
+    `SELECT id, title, subtitle, author, categories, mentions, comments, likes, impressions, ratings, pages,
+      (SELECT COUNT(*) FROM aggregated_books AS ab WHERE ab.author = aggregated_books.author) AS author_books,
+      (SELECT SUM(mentions) FROM aggregated_books AS ab WHERE ab.author = aggregated_books.author) AS author_mentions
       FROM aggregated_books`
-    )
-    .all();
+  );
 
-  db.close();
+  const data = result.rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle,
+    author: row.author,
+    categories: row.categories,
+    mentions: row.mentions,
+    comments: row.comments,
+    likes: row.likes,
+    impressions: row.impressions,
+    ratings: row.ratings,
+    pages: row.pages,
+    author_books: row.author_books,
+    author_mentions: row.author_mentions,
+  }));
 
   return {
     props: {
