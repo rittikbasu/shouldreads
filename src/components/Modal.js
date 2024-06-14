@@ -15,7 +15,7 @@ const Modal = ({ book, onClose }) => {
       setIsClosing(false);
       document.body.style.overflow = "hidden";
 
-      fetch(`/api/getDescription?bookId=${book.id}`)
+      fetch(`/api/getDescription?gbooks_id=${book.gbooks_id}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.description) {
@@ -82,17 +82,22 @@ const Modal = ({ book, onClose }) => {
           <IoIosArrowRoundBack className="h-8 w-8 sm:h-10 sm:w-10" />
           <span className="ml-2 sm:text-xl">back</span>
         </div>
-        <div className="h-full overflow-scroll px-4 sm:px-12 pb-20 sm:pb-32">
-          <h2 className="text-2xl sm:text-3xl text-center text-zinc-200 pl-2 pb-8">
+        <div className="h-full overflow-scroll px-8 sm:px-12 pb-20 sm:pb-32">
+          <h2 className="text-2xl sm:text-3xl text-zinc-200 pb-4 capitalize">
             {book.title}
           </h2>
+          {book.subtitle && (
+            <h4 className="sm:text-2xl text-zinc-300  pb-4 capitalize">
+              {book.subtitle}
+            </h4>
+          )}
           <div className="flex flex-row space-x-4 sm:space-x-8">
             <div className="py-3">
               {imageLoading && (
                 <div className="w-28 h-40 bg-zinc-700 rounded-lg animate-pulse"></div>
               )}
               <Image
-                src={`https://books.google.com/books/content?id=${book.id}&printsec=frontcover&img=1&zoom=1&edge=none&source=gbs_api`}
+                src={`https://books.google.com/books/content?id=${book.gbooks_id}&printsec=frontcover&img=1&zoom=1&edge=none&source=gbs_api`}
                 alt={`${book.title} cover`}
                 width={100}
                 height={150}
@@ -106,7 +111,7 @@ const Modal = ({ book, onClose }) => {
             <div className="flex flex-col space-y-4">
               <div className="p-2 rounded-lg">
                 <h4 className="sm:text-xl text-zinc-500">Author</h4>
-                <p className="text-xl sm:text-3xl">{book.author}</p>
+                <p className="text-xl sm:text-3xl">{book.author || "N/A"}</p>
               </div>
               {book.categories && (
                 <div className="p-2 rounded-lg">
@@ -122,10 +127,12 @@ const Modal = ({ book, onClose }) => {
             {book.ratings && (
               <p className="text-gray-400">Rating: {book.ratings}</p>
             )}
-            <div className="text-gray-400">Pages: {book.pages}</div>
+            <div className="text-gray-400">Pages: {book.pages || "N/A"}</div>
           </div>
           <div className="p-2 rounded-lg mt-4 sm:space-y-4">
-            <h4 className="sm:text-2xl text-zinc-500">Description</h4>
+            <h4 className="sm:text-2xl text-xl text-zinc-500 mb-2">
+              Description
+            </h4>
             {loading ? (
               <div className="space-y-4 mt-2">
                 <div className="h-4 animate-pulse bg-zinc-700 rounded w-3/4"></div>
@@ -137,8 +144,11 @@ const Modal = ({ book, onClose }) => {
                 <div className="h-4 animate-pulse bg-zinc-700 rounded w-full"></div>
               </div>
             ) : (
-              <p className="text-lg sm:text-xl font-light text-zinc-300 tracking-widest">
-                {description}
+              <p
+                className="text-base sm:text-xl font-light text-zinc-300 tracking-wide"
+                style={{ wordSpacing: "0.4em" }}
+              >
+                {description || "N/A"}
               </p>
             )}
           </div>

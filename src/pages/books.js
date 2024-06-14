@@ -68,8 +68,10 @@ export default function Home({ data }) {
     );
 
     const filteredResults = data
-      .filter((item) => responseIds.includes(item.id))
-      .sort((a, b) => distanceMap.get(a.id) - distanceMap.get(b.id));
+      .filter((item) => responseIds.includes(item.gbooks_id))
+      .sort(
+        (a, b) => distanceMap.get(a.gbooks_id) - distanceMap.get(b.gbooks_id)
+      );
 
     setResults(filteredResults);
   };
@@ -206,7 +208,7 @@ export default function Home({ data }) {
         <div className="mt-10 sm:mt-12 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {results.map((book, index) => (
             <div
-              key={book.id}
+              key={book.gbooks_id}
               onClick={() => setSelectedBook(book)}
               className="relative p-4 bg-zinc-900/50 rounded-2xl shadow-md border border-zinc-900 hover:border-blue-500 group flex flex-col justify-between md:hover:scale-110 transition duration-500"
             >
@@ -243,7 +245,7 @@ export default function Home({ data }) {
                       book.title
                     )}`}
                     target="_blank"
-                    className="bg-gray-600/50 px-2 py-0.5 rounded-md text-gray-400 hover:bg-blue-700 hover:text-gray-300 flex items-center "
+                    className="bg-gray-600/50 px-2 py-0.5 rounded-md text-gray-400 hover:bg-blue-700 hover:text-gray-300 hidden sm:flex items-center"
                   >
                     <span className="text-sm">
                       <FaAmazon className="inline-block" /> Order
@@ -267,6 +269,16 @@ export default function Home({ data }) {
                     <IoMdStar className="inline-block mr-1" />
                     <span>{book.ratings || "N/A"}</span>
                   </div>
+                  <Link
+                    href={`https://www.amazon.com/s?k=${encodeURIComponent(
+                      book.title
+                    )}`}
+                    target="_blank"
+                    className="flex sm:hidden items-center"
+                  >
+                    <FaAmazon className="inline-block mr-1" />
+                    <span>Buy</span>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -285,14 +297,14 @@ export default function Home({ data }) {
 
 export async function getStaticProps() {
   const result = await turso.execute(
-    `SELECT id, title, subtitle, author, categories, mentions, comments, likes, impressions, ratings, pages,
+    `SELECT gbooks_id, title, subtitle, author, categories, mentions, comments, likes, impressions, ratings, pages,
       (SELECT COUNT(*) FROM aggregated_books AS ab WHERE ab.author = aggregated_books.author) AS author_books,
       (SELECT SUM(mentions) FROM aggregated_books AS ab WHERE ab.author = aggregated_books.author) AS author_mentions
       FROM aggregated_books`
   );
 
   const data = result.rows.map((row) => ({
-    id: row.id,
+    gbooks_id: row.gbooks_id,
     title: row.title,
     subtitle: row.subtitle,
     author: row.author,

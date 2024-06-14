@@ -1,9 +1,9 @@
 import { turso } from "@/utils/db";
 
 export default async function handler(req, res) {
-  const { bookId } = req.query;
+  const { gbooks_id } = req.query;
 
-  if (!bookId) {
+  if (!gbooks_id) {
     return res.status(400).json({ error: "Book ID is required" });
   }
 
@@ -12,9 +12,9 @@ export default async function handler(req, res) {
       sql: `
           SELECT description
           FROM aggregated_books
-          WHERE id = ?
+          WHERE gbooks_id = ?
         `,
-      args: [bookId],
+      args: [gbooks_id],
     });
 
     if (response.rows.length === 0) {
