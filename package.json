@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@libsql/client": "^0.6.2",
+    "axios": "^1.7.2",
     "better-sqlite3": "^11.0.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.10",

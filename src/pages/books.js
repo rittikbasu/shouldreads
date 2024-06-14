@@ -18,6 +18,7 @@ export default function Home({ data }) {
   const [filter, setFilter] = useState("");
   const [selectedBook, setSelectedBook] = useState(null);
   const [showTopButton, setShowTopButton] = useState(false);
+  const [amazonTLD, setAmazonTLD] = useState("com");
   const searchPlaceholders = [
     "The Beginning of Infinity",
     "George Orwell",
@@ -68,10 +69,8 @@ export default function Home({ data }) {
     );
 
     const filteredResults = data
-      .filter((item) => responseIds.includes(item.gbooks_id))
-      .sort(
-        (a, b) => distanceMap.get(a.gbooks_id) - distanceMap.get(b.gbooks_id)
-      );
+      .filter((item) => responseIds.includes(item.rowid))
+      .sort((a, b) => distanceMap.get(a.rowid) - distanceMap.get(b.rowid));
 
     setResults(filteredResults);
   };
@@ -150,6 +149,18 @@ export default function Home({ data }) {
       : impressions;
   };
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch(`/api/getAmazonTLD`);
+        const data = await response.json();
+        setAmazonTLD(data.tld);
+      } catch (error) {
+        console.error("Error fetching Amazon domain:", error);
+      }
+    })();
+  }, []);
+
   return (
     <>
       <div className="sticky top-0 w-full max-w-md z-20 mt-8 md:mt-16">
@@ -197,7 +208,7 @@ export default function Home({ data }) {
           </div>
         </div>
         <button
-          onClick={clearFilter}
+          onClick={() => filter && clearFilter()}
           className="text-blue-500/80 text-sm rounded-lg flex items-center ml-auto"
         >
           <MdClear className="mr-1" /> clear filters
@@ -208,8 +219,8 @@ export default function Home({ data }) {
         <div className="mt-10 sm:mt-12 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {results.map((book, index) => (
             <div
-              key={book.gbooks_id}
-              onClick={() => setSelectedBook(book)}
+              key={book.id}
+              onClick={() => book.gbooks_id && setSelectedBook(book)}
               className="relative p-4 bg-zinc-900/50 rounded-2xl shadow-md border border-zinc-900 hover:border-blue-500 group flex flex-col justify-between md:hover:scale-110 transition duration-500"
             >
               <div className="absolute z-0 blur-3xl h-16 w-16 rounded-full top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-500"></div>
@@ -226,12 +237,17 @@ export default function Home({ data }) {
                   <h3 className="text-lg text-zinc-200 font-medium group-hover:text-blue-300 transition-colors duration-500 capitalize">
                     {book.title}
                   </h3>
-                  <p className="text-sm text-gray-500 line-clamp-1 group-hover:line-clamp-none">
+                  <p className="text-sm text-gray-500 line-clamp-1 sm:group-hover:line-clamp-none">
                     {book.author}
                   </p>
                   <p className="text-sm text-blue-200 mt-2 line-clamp-1 group-hover:line-clamp-none group-hover:text-zinc-200 transition-colors duration-500">
                     {book.categories}
                   </p>
+                  {!book.gbooks_id && (
+                    <p className="text-sm text-red-500 mt-2">
+                      Book not found on Google Books
+                    </p>
+                  )}
                 </div>
                 <div className="my-4 flex items-center justify-between">
                   <p className="text-sm hidden md:block text-gray-500">
@@ -241,7 +257,7 @@ export default function Home({ data }) {
                     Mentioned {book.mentions} times
                   </p>
                   <Link
-                    href={`https://www.amazon.com/s?k=${encodeURIComponent(
+                    href={`https://www.amazon.${amazonTLD}/s?k=${encodeURIComponent(
                       book.title
                     )}`}
                     target="_blank"
@@ -270,7 +286,7 @@ export default function Home({ data }) {
                     <span>{book.ratings || "N/A"}</span>
                   </div>
                   <Link
-                    href={`https://www.amazon.com/s?k=${encodeURIComponent(
+                    href={`https://www.amazon.${amazonTLD}/s?k=${encodeURIComponent(
                       book.title
                     )}`}
                     target="_blank"
@@ -297,13 +313,14 @@ export default function Home({ data }) {
 
 export async function getStaticProps() {
   const result = await turso.execute(
-    `SELECT gbooks_id, title, subtitle, author, categories, mentions, comments, likes, impressions, ratings, pages,
+    `SELECT id, gbooks_id, title, subtitle, author, categories, mentions, comments, likes, impressions, ratings, pages,
       (SELECT COUNT(*) FROM aggregated_books AS ab WHERE ab.author = aggregated_books.author) AS author_books,
       (SELECT SUM(mentions) FROM aggregated_books AS ab WHERE ab.author = aggregated_books.author) AS author_mentions
       FROM aggregated_books`
   );
 
   const data = result.rows.map((row) => ({
+    id: row.id,
     gbooks_id: row.gbooks_id,
     title: row.title,
     subtitle: row.subtitle,
