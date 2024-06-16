@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import clsx from "clsx";
+import Minisearch from "minisearch";
 
 import { FaHeart, FaRegComment, FaAmazon, FaChevronDown } from "react-icons/fa";
 import { IoIosStats, IoMdStar } from "react-icons/io";
@@ -8,6 +9,7 @@ import { MdClear } from "react-icons/md";
 import { CiDesktopMouse2 } from "react-icons/ci";
 
 import { turso } from "@/utils/db";
+import { sortResultsByFilter } from "@/utils/sortResultsByFilter";
 import { Searchbar } from "@/components/Searchbar";
 import Modal from "@/components/Modal";
 
@@ -21,7 +23,7 @@ export default function Home({ data }) {
   const [amazonTLD, setAmazonTLD] = useState("com");
   const searchPlaceholders = [
     "The Beginning of Infinity",
-    "George Orwell",
+    "Philosophy",
     "Fyodor Dostoevsky",
     "Fahrenheit 451",
   ];
@@ -32,24 +34,38 @@ export default function Home({ data }) {
     "Classic literature",
   ];
 
+  const miniSearch = new Minisearch({
+    fields: ["title", "author", "categories"],
+    storeFields: ["id"],
+    searchOptions: {
+      prefix: true,
+      fuzzy: 0.2,
+    },
+  });
+
+  miniSearch.addAll(data);
+
   const handleSearch = (query) => {
-    const filteredResults = data.filter(
-      (book) =>
-        book.title.toLowerCase().includes(query.toLowerCase()) ||
-        book.author.toLowerCase().includes(query.toLowerCase())
+    if (!query) {
+      setResults(data);
+      return;
+    }
+
+    const searchResults = miniSearch.search(query);
+    const resultIds = searchResults.map((result) => result.id);
+    let filteredResults = resultIds.map((id) =>
+      data.find((book) => book.id === id)
     );
 
-    // Prioritize results by book title
-    const prioritizedResults = filteredResults.sort((a, b) => {
-      const aTitleMatch = a.title.toLowerCase().includes(query.toLowerCase());
-      const bTitleMatch = b.title.toLowerCase().includes(query.toLowerCase());
-      return bTitleMatch - aTitleMatch;
-    });
+    if (filter) {
+      filteredResults = sortResultsByFilter(filteredResults, filter);
+    }
 
-    setResults(prioritizedResults);
+    setResults(filteredResults);
   };
 
   const handleAISearch = async (query) => {
+    setFilter("");
     const response = await fetch("/api/search", {
       method: "POST",
       body: JSON.stringify({ query }),
@@ -60,17 +76,15 @@ export default function Home({ data }) {
 
     if (!response.ok) {
       console.error("Error fetching data");
+      return;
     }
+
     const responseData = await response.json();
+    const responseIds = responseData.map((item) => item.id);
 
-    const responseIds = responseData.map((item) => item.rowid);
-    const distanceMap = new Map(
-      responseData.map((item) => [item.rowid, item.distance])
-    );
-
-    const filteredResults = data
-      .filter((item) => responseIds.includes(item.rowid))
-      .sort((a, b) => distanceMap.get(a.rowid) - distanceMap.get(b.rowid));
+    let filteredResults = responseIds
+      .map((id) => data.find((item) => item.id === id))
+      .filter((item) => item !== undefined);
 
     setResults(filteredResults);
   };
@@ -95,35 +109,18 @@ export default function Home({ data }) {
     const selectedFilter = e.target.value;
     setFilter(selectedFilter);
 
-    const sortedResults = [...data].sort((a, b) => {
-      switch (selectedFilter) {
-        case "mentions":
-          return b.mentions - a.mentions;
-        case "likes":
-          return b.likes - a.likes;
-        case "comments":
-          return b.comments - a.comments;
-        case "impressions":
-          return b.impressions - a.impressions;
-        case "ratings":
-          return Number(b.ratings) - Number(a.ratings);
-        case "topAuthors":
-          // Sort by mentions first, then by the number of books
-          return (
-            b.author_mentions - a.author_mentions ||
-            b.author_books - a.author_books
-          );
-        default:
-          return 0;
-      }
-    });
+    let sortedResults = [...results];
+    if (selectedFilter) {
+      sortedResults = sortResultsByFilter(sortedResults, selectedFilter);
+    }
 
     setResults(sortedResults);
   };
 
   const clearFilter = () => {
     setFilter("");
-    setResults(data);
+    const sortedResults = [...results].sort((a, b) => a.id - b.id);
+    setResults(sortedResults);
   };
 
   useEffect(() => {
@@ -167,7 +164,7 @@ export default function Home({ data }) {
         <label className="block text-center text-gray-500 mb-2">
           {aiToggle
             ? "what kind of book are you looking for?"
-            : "search for a book or an author"}
+            : "search for a book, author or a genre"}
         </label>
         <Searchbar
           placeholders={aiToggle ? aiPlaceholders : searchPlaceholders}
@@ -182,11 +179,11 @@ export default function Home({ data }) {
       <button
         onClick={scrollToTop}
         className={clsx(
-          "fixed bottom-4 sm:bottom-8 right-4 md:left-[90%] lg:left-[80%] h-12 w-12 flex items-center justify-center bg-blue-500/30 webkit-backdrop-blur text-white p-2 rounded-full shadow-lg sm:hover:bg-blue-600/50 transition duration-500 z-20 outline-none",
+          "fixed bottom-4 sm:bottom-8 right-4 md:left-[90%] lg:left-[80%] h-12 w-12 flex items-center justify-center bg-zinc-500/30 webkit-backdrop-blur p-2 rounded-full transition-opacity duration-500 z-20 outline-none group",
           showTopButton ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
       >
-        <CiDesktopMouse2 className="h-8 w-8 text-zinc-300" />
+        <CiDesktopMouse2 className="h-8 w-8 text-blue-400 group-hover:text-blue-500" />
       </button>
       <div className="flex justify-between items-center mt-4 w-full max-w-md transition-transform duration-500 sm:px-1">
         <div className="flex items-center min-w-44 pl-3 pr-1 py-1 bg-zinc-700/50 text-sm text-gray-400 border rounded-lg border-zinc-700/40">
@@ -196,13 +193,15 @@ export default function Home({ data }) {
               onChange={handleFilterChange}
               className="outline-none appearance-none w-full bg-transparent"
             >
-              <option value="">filters</option>
+              <option value="" disabled>
+                filters
+              </option>
               <option value="topAuthors">top authors</option>
-              <option value="ratings">top ratings</option>
-              <option value="mentions">top mentions</option>
-              <option value="likes">top likes</option>
-              <option value="comments">top comments</option>
-              <option value="impressions">top impressions</option>
+              <option value="ratings">top rated</option>
+              <option value="mentions">most mentioned</option>
+              <option value="likes">most liked</option>
+              <option value="comments">most commented</option>
+              <option value="impressions">most seen</option>
             </select>
             <FaChevronDown className="absolute right-2 h-2.5 w-2.5 top-1/2 transform -translate-y-1/2 text-gray-300 pointer-events-none" />
           </div>
@@ -245,7 +244,7 @@ export default function Home({ data }) {
                   </p>
                   {!book.gbooks_id && (
                     <p className="text-sm text-red-500 mt-2">
-                      Book not found on Google Books
+                      Data unavailable
                     </p>
                   )}
                 </div>

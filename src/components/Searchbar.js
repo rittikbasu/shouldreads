@@ -246,7 +246,7 @@ export function Searchbar({
       {!aiToggle && value && (
         <button
           type="button"
-          className="absolute right-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 text-zinc-500 flex items-center cursor-pointer"
+          className="absolute right-4 top-1/2 z-50 -translate-y-1/2 h-8 w-4 text-zinc-500 flex items-center cursor-pointer"
           onClick={vanishInput}
         >
           <MdClear className="h-4 w-4" />
