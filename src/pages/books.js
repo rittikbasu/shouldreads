@@ -214,7 +214,7 @@ export default function Home({ data }) {
         </button>
       </div>
 
-      {results && (
+      {results.length > 0 ? (
         <div className="mt-10 sm:mt-12 w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {results.map((book, index) => (
             <div
@@ -304,6 +304,51 @@ export default function Home({ data }) {
               onClose={() => setSelectedBook(null)} // Close the modal
             />
           )}
+        </div>
+      ) : (
+        <div className="text-blue-400 mt-8 sm:text-lg sm:tracking-wide">
+          there are no results for this query but here are some insights from
+          all this data:
+          <ul
+            className="list-decimal mt-4 ml-4 text-gray-400 space-y-2"
+            style={{ wordSpacing: "0.2em" }}
+          >
+            <li>
+              people seem to love books that offer timeless wisdom, practical
+              advice, and captivating stories.
+            </li>
+            <li>
+              classics like{" "}
+              <span className="underline underline-offset-2">Meditations</span>{" "}
+              and{" "}
+              <span className="underline underline-offset-2">
+                The 48 Laws of Power
+              </span>{" "}
+              are hits because they provide guidance that&apos;s still relevant
+              today.
+            </li>
+            <li>
+              science and history books like{" "}
+              <span className="underline underline-offset-2">Sapiens</span> and{" "}
+              <span className="underline underline-offset-2">
+                A Short History of Nearly Everything
+              </span>{" "}
+              show that there&apos;s a big interest in understanding the world
+              and our place in it.
+            </li>
+            <li>
+              interestingly,{" "}
+              <span className="underline underline-offset-2">
+                philosophical
+              </span>{" "}
+              books appear a lot, suggesting that people are searching for
+              deeper meaning and ways to navigate life&apos;s big questions.
+            </li>
+            <li>
+              there&apos;s also a noticeable interest in specialized knowledge,
+              like tech and business skills.
+            </li>
+          </ul>
         </div>
       )}
     </>
