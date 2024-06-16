@@ -80,7 +80,7 @@ const Modal = ({ book, onClose }) => {
             {book.title}
           </h2>
           {book.subtitle && (
-            <h4 className="sm:text-2xl text-zinc-300 pb-4 sm:pb-8 capitalize">
+            <h4 className="sm:text-xl text-zinc-300 pb-4 sm:pb-8 capitalize">
               {book.subtitle}
             </h4>
           )}
