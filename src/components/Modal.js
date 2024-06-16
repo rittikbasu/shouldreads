@@ -67,27 +67,20 @@ const Modal = ({ book, onClose }) => {
       }}
       onClick={handleBackdropClick}
     >
-      <div className="bg-zinc-800/50 sm:rounded-3xl rounded-t-3xl max-w-xl sm:h-5/6 w-full overflow-hidden relative">
+      <div className="bg-zinc-800/50 sm:rounded-3xl rounded-t-3xl max-w-2xl sm:h-4/6 w-full overflow-hidden relative sm:pb-[6.4rem] sm:mx-8">
         <div
-          className="sm:hidden flex items-center cursor-pointer sm:px-8 px-4 my-4 text-blue-500 hover:text-blue-300"
+          className="flex items-center cursor-pointer px-4 sm:pl-8 my-4 text-blue-500 sm:hover:text-blue-600"
           onClick={handleClose}
         >
-          <IoIosArrowRoundBack className="h-8 w-8 sm:h-10 sm:w-10" />
+          <IoIosArrowRoundBack className="h-8 w-8" />
           <span className="ml-2 text-lg">back</span>
-        </div>
-        <div
-          className="hidden sm:flex top-3.5 left-0 items-center cursor-pointer sm:px-8 px-4 my-4 text-blue-500 hover:text-blue-300"
-          onClick={handleClose}
-        >
-          <IoIosArrowRoundBack className="h-8 w-8 sm:h-10 sm:w-10" />
-          <span className="ml-2 sm:text-xl">back</span>
         </div>
         <div className="h-full overflow-scroll px-8 sm:px-10 pb-20 sm:pb-32">
           <h2 className="text-2xl sm:text-3xl text-zinc-200 pb-4 capitalize">
             {book.title}
           </h2>
           {book.subtitle && (
-            <h4 className="sm:text-2xl text-zinc-300 pb-4 capitalize">
+            <h4 className="sm:text-2xl text-zinc-300 pb-4 sm:pb-8 capitalize">
               {book.subtitle}
             </h4>
           )}
@@ -121,15 +114,15 @@ const Modal = ({ book, onClose }) => {
               )}
             </div>
           </div>
-          {/* add mentions and page count */}
-          <div className="flex py-2 sm:text-lg rounded-xl mt-4 justify-between max-w-sm">
+
+          <div className="flex py-6 sm:text-lg rounded-xl justify-between max-w-sm">
             <div className="text-gray-400">Mentioned: {book.mentions}</div>
             {book.ratings && (
               <p className="text-gray-400">Rating: {book.ratings}</p>
             )}
             <div className="text-gray-400">Pages: {book.pages || "N/A"}</div>
           </div>
-          <div className="py-2 rounded-lg mt-4 sm:space-y-4">
+          <div className="sm:space-y-4">
             <h4 className="sm:text-2xl text-xl text-zinc-500 mb-2">
               Description
             </h4>
