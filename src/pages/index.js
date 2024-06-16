@@ -11,26 +11,31 @@ export default function Home() {
         <meta name="description" content="find must read books" />
         <title>shouldreads</title>
       </Head>
-      <div className="w-full my-8 md:mt-16">
-        <div className="rounded-xl sm:rounded-3xl overflow-hidden border border-zinc-900 bg-black">
-          <Image
-            src="/tweet.jpeg"
-            alt="Logo"
-            width={500}
-            height={500}
-            className="object-cover w-full p-2 pb-1.5 sm:p-4 sm:pb-3"
-          />
-        </div>
+      <div className="w-full my-8 sm:mt-16">
+        <Link
+          target="_blank"
+          href="https://x.com/amix011/status/1797696341738688557"
+        >
+          <div className="rounded-xl sm:rounded-3xl overflow-hidden border border-zinc-900 bg-black min-h-28 md:min-h-56 lg:min-h-64">
+            <Image
+              src="/tweet.jpeg"
+              alt="Logo"
+              width={500}
+              height={500}
+              className="object-cover w-full p-2 pb-1.5 sm:p-4 sm:pb-3"
+            />
+          </div>
+        </Link>
       </div>
       <div className="bg-black pb-2">
         <p className="text-gray-400 text-justify text-balance text-base leading-relaxed sm:text-xl">
-          I came across this post on twitter and under it I found so many
-          amazing book recommendations. It was overwhelming to keep track of all
-          the titles, and I really wanted to know which books and authors were
-          mentioned the most, what were the top rated books, and which books
-          were liked the most. So, I created this website using some data
-          science + ai magic to not only help myself but also to share this
-          treasure trove of book recommendations with others. Enjoy!
+          I came across this post on twitter with tons of really good book
+          recommendations in the comments. It was hard to keep track of all the
+          titles, and I wanted to see which books, authors and genres were
+          mentioned the most, which ones were top rated, and which ones people
+          liked the most. So, I compiled all the book recommendations using some
+          data science + AI magic and built this website to share these great
+          book finds with everyone. Enjoy!
         </p>
       </div>
       <Link
