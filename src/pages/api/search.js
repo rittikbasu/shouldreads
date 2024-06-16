@@ -1,19 +1,20 @@
 import { getEmbedding } from "../../utils/embedding";
-import { init } from "../../utils/db";
-
-const db = init();
+import { turso } from "@/utils/db";
 
 const search = async (text) => {
-  const vector = await getEmbedding(text);
-  const searchQuery = db.prepare(`
-  SELECT rowid, distance
-  FROM vss_aggregated_books
-  WHERE vss_search(vector, ?)
-  LIMIT 10;
-`);
-
-  const results = searchQuery.all(JSON.stringify(vector));
-  return results;
+  const queryEmbedding = JSON.stringify(await getEmbedding(text));
+  const searchQuery = await turso.execute({
+    sql: `
+      SELECT id, vector_distance_cos(embedding, ?) AS distance
+      FROM aggregated_books
+      WHERE embedding IS NOT NULL
+      AND distance < 0.68
+      ORDER BY distance ASC
+      LIMIT 10;
+`,
+    args: [queryEmbedding],
+  });
+  return searchQuery;
 };
 
 export default async function handler(req, res) {
@@ -22,7 +23,8 @@ export default async function handler(req, res) {
       const { query } = req.body;
       console.log("query", query);
 
-      const similarBooks = await search(query);
+      const searchQuery = await search(query);
+      const similarBooks = searchQuery.rows;
       console.log("similarBooks", similarBooks);
       res.status(200).json(similarBooks);
     } catch (error) {
