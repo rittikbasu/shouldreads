@@ -69,11 +69,7 @@ export default function App({ Component, pageProps }) {
         <Component {...pageProps} />
       </main>
       <footer className="my-4 text-center text-sm sm:text-base text-zinc-500 font-mono">
-        <Link
-          target="_blank"
-          href="https://twitter.com/_rittik"
-          className="group"
-        >
+        <Link target="_blank" href="https://rittik.io" className="group">
           <span>
             by <span className="group-hover:text-blue-300">@_rittik</span>
           </span>
