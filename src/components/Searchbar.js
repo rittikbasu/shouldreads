@@ -184,6 +184,7 @@ export function Searchbar({
         name="search"
         autoComplete="off"
         maxLength={100}
+        minlength={5}
         className={cn(
           "w-full relative text-sm sm:text-base z-50 border-none text-white bg-transparent h-full rounded-2xl focus:outline-none focus:ring-0 pl-12 sm:pl-14 pr-12 sm:pr-14",
           animating && "text-transparent dark:text-transparent",
