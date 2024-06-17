@@ -20,7 +20,7 @@ i came across a post on twitter with tons of really good book recommendations in
 
 ## getting started
 
-to get formulator up and running follow these simple steps:
+to get shouldreads up and running follow these simple steps:
 
 1. clone the repository:
    ```bash
