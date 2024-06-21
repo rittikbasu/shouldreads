@@ -1,6 +1,6 @@
 # shouldreads
 
-i came across a post on twitter with tons of really good book recommendations in the comments. it was tough to keep track of all the titles, and I wanted to see which books, authors, genres were mentioned the most, which ones were top rated, and which ones people liked the most. So, I compiled all the book recommendations using some data science + ai magic and built this website with advanced search and filtering capabilities to share these great book finds with everyone :)
+i came across [this](https://x.com/amix011/status/1797696341738688557) post on twitter with tons of really good book recommendations in the comments. it was tough to keep track of all the titles, and I wanted to see which books, authors, genres were mentioned the most, which ones were top rated, and which ones people liked the most. So, I compiled all the book recommendations using some data science + ai magic and built this website with advanced search and filtering capabilities to share these great book finds with everyone :)
 
 ![formulator](<https://ik.imagekit.io/zwcfsadeijm/shouldreads_PoYX7nXv8.png?updatedAt=1718563866063>)
 
